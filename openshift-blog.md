@@ -15,7 +15,7 @@ This tutorial will guide you to:
 3. Deploy the Generated API Portal in the OpenShift cluster 
 4. Setup CI/CD using Tekton and GitHub Actions to automate updates to the API Portal
 
-![Send a Message Guide Portal Image]()   
+![Send a Message Guide Portal Image](images/image12.png)   
 
 # Prerequisites
 
@@ -58,7 +58,7 @@ Create an instance of the APIMatic Codegen Application. You will need to Base64 
 
 You should now have the CodeGen Application running in your Openshift cluster.
 
-![Red Hat OpenShift Image]()
+![Red Hat OpenShift Image](images/image2.png)
 
 # SDK & API Portal Generation using APIMatic CodeGen
 
@@ -226,7 +226,7 @@ spec:
 
 `oc apply -f .tekton/pipeline.yaml -n $OPENSHIFT_PROJECT`
 
-![build and deploy pipeline image]()
+![build and deploy pipeline image](images/image7.png)
 
 3. With the pipeline applied, you are ready to execute it. You will need to pass in the following parameters in order to do so:
 
@@ -266,13 +266,13 @@ tkn pipeline start build-and-deploy \
           -n $OPENSHIFT_PROJECT
 ```
 
-![build and deploy-run image]()
+![build and deploy-run image](images/image10.png)
 
 5. After successful completion of this pipeline, navigate to the **Networking** section in your Openshift Console to see the **Route** that exposes the generated API Portal.
 
-![Routes Image]()
+![Routes Image](images/image3.png)
 
-![APIMatic Calculator Image]()
+![APIMatic Calculator Image](images/image11.png)
 
 ## Components of the Generated API Portal
 
@@ -287,7 +287,7 @@ This includes:
 
 # GitHub Actions
 
-![Flowchart Image]()
+![Flowchart Image](images/image4.png)
 
 In the previous steps, you set up the APIMatic CodeGen application in your Openshift Cluster and used it to generate an API Portal via a Tekton pipeline. Although tekton is doing a lot of the heavy lifting, there are still some steps that need to be performed manually, such as the installation of the APIMatic CodeGen Operator and instantiation of the CodeGen application. 
 
@@ -310,9 +310,9 @@ In order to use this GitHub Action, you will be required to set up the following
 
 With these repository secrets set up, you can trigger the workflow. 
 
-![Setup Red Hat OpenShift Infrastructure Image]()
+![Setup Red Hat OpenShift Infrastructure Image](images/image6.png)
 
-![Setup Red Hat OpenShift Infrastructure Jobs Image]()
+![Setup Red Hat OpenShift Infrastructure Jobs Image](images/image9.png)
 
 When execution of this workflow completes, you should have an API Portal up and running in your Openshift Cluster. As before, you can find the **Route** where the generated Portal is accessible by navigating to the **Networking** section of your Openshift Console.
 
@@ -332,13 +332,12 @@ The *.github/workflows* directory defines a workflow in the **main.yml** file wh
 
 Try this out by modifying any of the Markdown files under the *Portal/Content* directory and pushing to the main branch. 
 
-![OpenShift Pipelines Demo Image]()
+![OpenShift Pipelines Demo Image](images/image1.png)
 
 This commit should trigger the **Openshift Pipeline on Push** action which will regenerate and redeploy your API Portal to reflect your updates. 
 
-![Updated Content to Test Automation Image]()
+![Updated Content to Test Automation Image](images/image8.png)
 
-![WhatsApp Cloud API Portal Image]()
 
 ## Next Steps
 
