@@ -2,7 +2,7 @@
 
 Developers and architects devote a significant amount of time to automate an application's lifecycle. They may use pipelines and workflows to build, test and deploy application code automatically.
 
-However, once the dust has settled on the software lifecycle, someone must write the documentation and in case of APIs, update the SDKs/libraries. These are frequently regarded as janitorial duties in software development, assigned to a junior developer or intern. Or even worse, a senior engineer must dedicate valuable time to write a code sample for a documentation wiki.
+However, once the dust has settled on the software lifecycle, someone must write the documentation and in case of APIs, update the SDKs/libraries. These are frequently regarded as janitorial duties in software development, assigned to a junior developer or intern. Or even worse, a senior engineer must dedicate valuable time to write a code sample for a documentation wiki or add an endpoint to SDKs.
 
 This manual and mundane task can actually be fully automated by integrating documentation and SDK generation directly into existing CI/CD pipelines.
 
@@ -15,6 +15,8 @@ This tutorial will guide you to:
 3. Deploy the Generated API Portal in the OpenShift cluster 
 4. Setup CI/CD using Tekton and GitHub Actions to automate updates to the API Portal
 
+This is what the generated API Portal will look like: 
+
 ![Send a Message Guide Portal Image](images/image12.png)   
 
 # Prerequisites
@@ -23,20 +25,20 @@ Here is what you need to follow along with this demo:
 
 1. An evaluation license from APIMatic. (Contact `sales@apimatic.io` for a trial license)
 2. An Openshift Cluster
-3. Oc and tkn CLIs
+3. `oc` and `tkn` CLIs
 
 All of the files referred to in the tutorial are available in this [Git repository](https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo).
 
-You can also replicate this workflow using your hosted APIMatic account as demonstrated in this [GitHub repository](https://github.com/apimatic/static-portal-workflow).
+Alternatively, you can also replicate this workflow using APIMatic's hosted solution as demonstrated in this [GitHub repository](https://github.com/apimatic/static-portal-workflow).
 
 # Application Setup
 
-The following section details setting up the APIMatic CodeGen Application in your Openshift Cluster. Before proceeding, clone the sample repository ([https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo](https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo)) and navigate to the root of your local copy.
+The following section details setting up the APIMatic CodeGen Application in your Openshift Cluster. Before proceeding, clone the  [sample repository](https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo) and navigate to the root of your local copy.
 
 
 ## Install Operators
 
-Install the APIMatic CodeGen Operator along with the Red Hat Openshift Pipelines Operator. The provided manifest file will help you do this. 
+Install the [APIMatic CodeGen Operator](https://catalog.redhat.com/software/containers/apimatic/apimatic-codegen-operator-ubi8/6298c55a90316b739bb8ec87) along with the Red Hat Openshift Pipelines Operator. The provided manifest file will help you do this. 
 
 `oc apply -f setup/operatorsassets.yaml`
 
@@ -50,7 +52,7 @@ Create a Project where the resources provisioned for this demo will reside. Stor
 
 ## Instantiate APIMatic Codegen 
 
-Create an instance of the APIMatic Codegen Application. You will need to Base64 encode your APIMatic evaluation license and substitute the placeholder in the *setup/codegen.yaml* file with it.  
+Create an instance of the APIMatic Codegen Application. You will need to Base64 encode your APIMatic evaluation license and substitute the placeholder in the `setup/codegen.yaml` file with it.  
 
 `sed -i -e 's/LICENSE_PLACE_HOLDER/&lt;Your Apimatic License Blob>/' setup/codegen.yaml`
 
@@ -81,7 +83,7 @@ This section details setting up pipelines to automate API Portal generation and 
 
 ## Setup Tekton Pipeline
 
-The `.tekton` directory contains the pipeline required to generate and deploy an API Portal using APIMatic Codegen. This pipeline uses tasks sourced from the Tekton community hub as well as custom tasks. Each task represents a step in the API Portal generation process.
+The `.tekton` directory contains the pipeline required to generate and deploy an API Portal using APIMatic Codegen. This pipeline uses tasks sourced from the **Tekton community hub** as well as custom tasks. Each task represents a step in the API Portal generation process.
 
 Following is a brief description of each pipeline task according to the order of execution.
 
@@ -211,67 +213,59 @@ spec:
 
 ## Apply Tekton Pipeline
 
-1. Once you have updated the deployment, apply all Pipeline tasks using the following commands:
-
-`oc apply -f .tekton/apply-manifest-task.yaml -n $OPENSHIFT_PROJECT`
-
-`oc apply -f .tekton/update-deployment-task.yaml -n $OPENSHIFT_PROJECT`
-
-`oc apply -f .tekton/get-portal-zip.yaml -n $OPENSHIFT_PROJECT`                                    
-
+1. Once you have updated the deployment, apply all Pipeline tasks using the following commands:  
+`oc apply -f .tekton/apply-manifest-task.yaml -n $OPENSHIFT_PROJECT`  
+`oc apply -f .tekton/update-deployment-task.yaml -n $OPENSHIFT_PROJECT`  
+`oc apply -f .tekton/get-portal-zip.yaml -n  $OPENSHIFT_PROJECT`
 `oc apply -f .tekton/zip-build-folder-task.yaml -n $OPENSHIFT_PROJECT`
 
-2. Next, apply the pipeline:
-
-`oc apply -f .tekton/pipeline.yaml -n $OPENSHIFT_PROJECT`
-
+2. Next, apply the pipeline:  
+`oc apply -f .tekton/pipeline.yaml -n $OPENSHIFT_PROJECT`  
 ![build and deploy pipeline image](images/image7.png)
 
-3. With the pipeline applied, you are ready to execute it. You will need to pass in the following parameters in order to do so:
-
-```
-params:
-    - description: name of the deployment to be patched
-      name: deployment-name
-      type: string
-    - description: url of the git repo for the code of deployment
-      name: git-url
-      type: string
-    - default: main
-      description: revision to be used from repo of the code for deployment
-      name: git-revision
-      type: string
-    - description: image to be build from the code
-      name: IMAGE
-      type: string
-    - description: >-
-        The OpenShift DNS url of the APIMatic CodeGen service running in the
-        cluster
-      name: apimatic-codegen-service
-      type: string
-```
+3. With the pipeline applied, you are ready to execute it. You will need to pass in the following parameters in order to do so: 
+    ```
+    params:
+        - description: name of the deployment to be patched
+          name: deployment-name
+          type: string
+        - description: url of the git repo for the code of deployment
+          name: git-url
+          type: string
+        - default: main
+          description: revision to be used from repo of the code for deployment
+          name: git-revision
+          type: string
+        - description: image to be build from the code
+          name: IMAGE
+          type: string
+        - description: >-
+            The OpenShift DNS url of the APIMatic CodeGen service running in the
+            cluster
+          name: apimatic-codegen-service
+          type: string
+    ```
 
 4. Use the tkn Client to pass in these parameters and execute the Pipeline:
+    ```
+    tkn pipeline start build-and-deploy \
+              -w name=shared-workspace,volumeClaimTemplateFile=.tekton/persistent_volume_claim.yaml \
+              -p deployment-name=apimatic-dx-portal-demo \
+              -p git-url=https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo\ 
+              -p IMAGE="image-registry.openshift-image-registry.svc:5000/$OPENSHIFT_PROJECT/apimatic-dx-portal-demo" \
+              -p apimatic-codegen-service="apimatic-codegen.$OPENSHIFT_PROJECT.svc.cluster.local" \
+              --use-param-defaults \
+              --showlog=true \
+              -n $OPENSHIFT_PROJECT
+    ```
 
-```
-tkn pipeline start build-and-deploy \
-          -w name=shared-workspace,volumeClaimTemplateFile=.tekton/persistent_volume_claim.yaml \
-          -p deployment-name=apimatic-dx-portal-demo \
-          -p git-url=https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo\ 
-          -p IMAGE="image-registry.openshift-image-registry.svc:5000/$OPENSHIFT_PROJECT/apimatic-dx-portal-demo" \
-          -p apimatic-codegen-service="apimatic-codegen.$OPENSHIFT_PROJECT.svc.cluster.local" \
-          --use-param-defaults \
-          --showlog=true \
-          -n $OPENSHIFT_PROJECT
-```
-
-![build and deploy-run image](images/image10.png)
+    ![build and deploy-run image](images/image10.png)
 
 5. After successful completion of this pipeline, navigate to the **Networking** section in your Openshift Console to see the **Route** that exposes the generated API Portal.
+ 
+    ![Routes Image](images/image3.png)
 
-![Routes Image](images/image3.png)
-
-![APIMatic Calculator Image](images/image11.png)
+    ![APIMatic Calculator Image](images/image11.png)
 
 ## Components of the Generated API Portal
 
