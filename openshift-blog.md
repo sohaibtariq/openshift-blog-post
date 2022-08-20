@@ -1,8 +1,8 @@
 # How to Automate SDK and Documentation Generation for Your REST APIs
 
-Developers and architects devote a significant amount of time to automate an application's lifecycle. They may use pipelines and workflows to build and test application code automatically, and in some cases the application code may be deployed directly into production.
+Developers and architects devote a significant amount of time to automate an application's lifecycle. They may use pipelines and workflows to build, test and deploy application code automatically.
 
-However, once the dust has settled on the software lifecycle, someone must write the documentation and update the SDKs/libraries. These are frequently regarded as janitorial duties in software development, assigned to a junior developer or intern. Or even worse, a senior employee must dedicate valuable time to write a code sample for a documentation wiki.
+However, once the dust has settled on the software lifecycle, someone must write the documentation and in case of APIs, update the SDKs/libraries. These are frequently regarded as janitorial duties in software development, assigned to a junior developer or intern. Or even worse, a senior engineer must dedicate valuable time to write a code sample for a documentation wiki.
 
 This manual and mundane task can actually be fully automated by integrating documentation and SDK generation directly into existing CI/CD pipelines.
 
@@ -10,8 +10,8 @@ APIMatic is a developer experience platform that focuses on automating the API C
 
 This tutorial will guide you to:
 
-1. Setup the APIMatic CodeGen Operator in your Openshift Cluster
-2. Generate SDKs and an API Portal for a sample REST API application
+1. Setup the [APIMatic CodeGen Operator](https://catalog.redhat.com/software/container-stacks/detail/61e57733e8757d324ee86de1) in your Openshift Cluster
+2. Auto-generate SDKs and an API Portal for a sample REST API application
 3. Deploy the Generated API Portal in the OpenShift cluster 
 4. Setup CI/CD using Tekton and GitHub Actions to automate updates to the API Portal
 
@@ -62,7 +62,7 @@ You should now have the CodeGen Application running in your Openshift cluster.
 
 # SDK & API Portal Generation using APIMatic CodeGen
 
-The APIMatic CodeGen application exposes a [REST API](https://apimatic-core-v3-docs.netlify.app/#/http/api-endpoints/client-generator/generate-using-file) that allows users to generate an API Portal consisting of reference documentation, code samples and SDKs in multiple programming languages. 
+The APIMatic CodeGen application exposes a [REST API](https://docs.apimatic.io/api/on-premises/#/http/api-endpoints/client-generator/generate-using-file) that allows users to generate an API Portal consisting of reference documentation, code samples and SDKs in multiple programming languages. 
 
 In order to generate this Portal, APIMatic CodeGen requires the following input files:
 
@@ -70,11 +70,10 @@ In order to generate this Portal, APIMatic CodeGen requires the following input 
 2. A JSON configuration file that allows you to configure the API Portal.
 3. [Optional] Custom documentation in Markdown format.
 
-The `Portal directory` in the sample repository contains these input files. 
-
+The `Portal` directory in the sample repository contains these input files. 
 Refer to the [documentation](https://docs.apimatic.io/api/on-premises/#/http/generating-api-portal/overview-generating-api-portal/inputs-for-portal-generation) to learn more about them. 
 
-These files are zipped together and passed to the APIMatic CodeGen application via a POST call to the `/build` endpoint. The subsequent steps of this tutorial will walk you through this process. 
+These files are zipped together and passed to the APIMatic CodeGen application via a POST call to the [/build](https://docs.apimatic.io/api/on-premises/#/http/api-endpoints/build/generate-using-file) endpoint. The subsequent steps of this tutorial will walk you through this process. 
 
 # Automation
 
@@ -82,17 +81,17 @@ This section details setting up pipelines to automate API Portal generation and 
 
 ## Setup Tekton Pipeline
 
-The *.tekton directory* contains the pipeline required to generate and deploy an API Portal using APIMatic Codegen. This pipeline uses tasks sourced from the Tekton community hub as well as custom tasks. Each task represents a step in the API Portal generation process.
+The `.tekton` directory contains the pipeline required to generate and deploy an API Portal using APIMatic Codegen. This pipeline uses tasks sourced from the Tekton community hub as well as custom tasks. Each task represents a step in the API Portal generation process.
 
 Following is a brief description of each pipeline task according to the order of execution.
 
 ### Fetch Repository
 
-This task makes use of the `git-clone` task from the community hub to clone the sample GitHub repository which you have already cloned. The manifest files in this repository are used to setup the required infrastructure and generate a sample API Portal.  
+This task makes use of the `git-clone` task from the community hub to clone the sample GitHub repository. The manifest files in this repository are used to setup the required infrastructure and generate a sample API Portal.  
 
 ### Zip Build Folder
 
-This task creates a .zip file from the contents of the `Portal directory` provided in the sample GitHub repository. This .zip file is required by APIMatic CodeGen to generate an API Portal. 
+This task creates a .zip file from the contents of the `Portal` directory provided in the sample GitHub repository. This .zip file is required by APIMatic CodeGen to generate an API Portal. 
 
 ```
 .tekton/zip-build-folder-task.yaml
@@ -282,7 +281,7 @@ This includes:
 
 1. **Getting Started guides:** Autogenerated guides that provide step-by-step instructions to help developers set up their environment and learn about essential things like Authentication and Response Codes.
 2. **SDKs:** Autogenerated Client Libraries in multiple programming languages that significantly reduce the amount of integration code developers need to write. These SDKs are battle tested and guaranteed to work when nothing else does.
-3. **Code Samples:** Code samples for integrating with each individual API endpoint. These code samples use the generated SDKs to make API calls and serve as starter code that can be used as-is without the need for any modification. This significantly reduces the *time to first API call* for the API.
+3. **Code Samples:** Code samples for integrating with each individual API endpoint. These code samples use the generated SDKs to make API calls and serve as starter code that can be used as-is without the need for any modification. This significantly reduces the developers' *time to first API call*.
 4. **Try-it-out:** The Portal provides users the ability to call the API from within the API Portal.
 
 # GitHub Actions
@@ -299,7 +298,7 @@ Start by forking the [sample repository](https://github.com/apimatic/apimatic-co
 
 The oc and tkn CLIs are available for use in GitHub Actions via the [openshift-tools-installer Action](https://github.com/marketplace/actions/openshift-tools-installer) provided by Red Hat on the GitHub marketplace. This Action is used by the provided workflow to automate infrastructure setup. 
 
-The **.github/workflows** directory contains a file called **setup_openshift_infrastructure.yaml**. This file defines a Github Action that automates all the steps that you have manually performed so far. 
+The `.github/workflows` directory contains a file called `setup_openshift_infrastructure.yaml`. This file defines a Github Action that automates all the steps that you have manually performed so far. 
 
 In order to use this GitHub Action, you will be required to set up the following repository secrets in the GitHub repository:
 
@@ -328,7 +327,7 @@ With the execution of this GitHub Action, you have:
 
 The above GitHub Action will take care of the initial setup and deployment of your API Portal. But what happens when your API specification is updated or a new documentation page must be added to the API Portal?
 
-The *.github/workflows* directory defines a workflow in the **main.yml** file which handles this. After any update to the Portal directory is pushed to the `main` branch of your forked repository, it instantly triggers the previously created tekton pipeline which regenerates and redeploys the API Portal.
+The `.github/workflows` directory defines a workflow in the `main.yml` file which handles this. After any update to the Portal directory is pushed to the `main` branch of your forked repository, it instantly triggers the previously created tekton pipeline which regenerates and redeploys the API Portal.
 
 Try this out by modifying any of the Markdown files under the *Portal/Content* directory and pushing to the main branch. 
 
