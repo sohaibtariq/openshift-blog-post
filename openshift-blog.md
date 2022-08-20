@@ -1,4 +1,4 @@
-# How to Automate SDK and Documentation Generation for Your REST APIs
+# How to Automate SDK and Documentation Generation for your REST APIs
 
 _Written by Sohaib Tariq and Obaid Rehman_
 
