@@ -8,11 +8,11 @@ However, once the dust has settled on the software lifecycle, someone must write
 
 This manual and mundane task can actually be fully automated by integrating documentation and SDK generation directly into existing CI/CD pipelines.
 
-APIMatic is a developer experience platform that focuses on automating the API Consumption phase of your API lifecycle. The on-premises code generation solution can be directly deployed in your Openshift cluster, however, there is also a fully managed and hosted option that you can try for free at [https://www.apimatic.io](https://apimatic.io).
+APIMatic is a developer experience platform that focuses on automating the API Consumption phase of your API lifecycle. The on-premises code generation solution can be directly deployed in your OpenShift cluster, however, there is also a fully managed and hosted option that you can try for free at [https://www.apimatic.io](https://apimatic.io).
 
 This tutorial will guide you to:
 
-1. Setup the [APIMatic CodeGen Operator](https://catalog.redhat.com/software/container-stacks/detail/61e57733e8757d324ee86de1) in your Openshift Cluster
+1. Setup the [APIMatic CodeGen Operator](https://catalog.redhat.com/software/container-stacks/detail/61e57733e8757d324ee86de1) in your OpenShift Cluster
 2. Auto-generate SDKs and an API Portal for a sample REST API application
 3. Deploy the Generated API Portal in the OpenShift cluster
 4. Setup CI/CD using Tekton and GitHub Actions to automate updates to the API Portal
@@ -26,7 +26,7 @@ This is what the generated API Portal will look like:
 Here is what you need to follow along with this demo:
 
 1. An evaluation license from APIMatic. (Contact `sales@apimatic.io` for a trial license)
-2. An Openshift Cluster
+2. An OpenShift Cluster
 3. `oc` and `tkn` CLIs
 
 All of the files referred to in the tutorial are available in this [Git repository](https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo).
@@ -35,11 +35,11 @@ Alternatively, you can also replicate this workflow using APIMatic's hosted solu
 
 # Application Setup
 
-The following section details setting up the APIMatic CodeGen Application in your Openshift Cluster. Before proceeding, clone the  [sample repository](https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo) and navigate to the root of your local copy.
+The following section details setting up the APIMatic CodeGen Application in your OpenShift Cluster. Before proceeding, clone the  [sample repository](https://github.com/apimatic/apimatic-codegen-openshift-pipelines-demo) and navigate to the root of your local copy.
 
 ## Install Operators
 
-Install the [APIMatic CodeGen Operator](https://catalog.redhat.com/software/containers/apimatic/apimatic-codegen-operator-ubi8/6298c55a90316b739bb8ec87) along with the Red Hat Openshift Pipelines Operator. The provided manifest file will help you do this.
+Install the [APIMatic CodeGen Operator](https://catalog.redhat.com/software/containers/apimatic/apimatic-codegen-operator-ubi8/6298c55a90316b739bb8ec87) along with the Red Hat OpenShift Pipelines Operator. The provided manifest file will help you do this.
 
 `oc apply -f setup/operatorsassets.yaml`
 
@@ -59,7 +59,7 @@ Create an instance of the APIMatic Codegen Application. You will need to Base64 
 
 `oc apply -f setup/codegen.yaml -n $OPENSHIFT_PROJECT`
 
-You should now have the CodeGen Application running in your Openshift cluster.
+You should now have the CodeGen Application running in your OpenShift cluster.
 
 ![Red Hat OpenShift Image](images/image2.png)
 
@@ -154,7 +154,7 @@ The buildah task from the Tekton hub is used to create and publish an image for 
 
 ### Apply Manifests
 
-This task applies the manifest files contained in the k8s directory of the sample repository. These manifest files set up the Deployment, Service and Route which will enable you to access the API Portal outside the Openshift cluster.  
+This task applies the manifest files contained in the k8s directory of the sample repository. These manifest files set up the Deployment, Service and Route which will enable you to access the API Portal outside the OpenShift cluster.  
   
 ```
 .tekton/apply-manifest-task.yaml
